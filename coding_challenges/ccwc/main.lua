@@ -1,50 +1,73 @@
-for i = 1, #arg do
-    if arg[i] == "-c" then
-        local f = assert(io.open(arg[i + 1], "rb"))
-        local count = 0
-        while true do
-            local bytes = f:read(1)
-            if not bytes then break end
-            count = count + 1
-        end
-        f:close()
-        print(count, arg[i + 1])
-    elseif arg[i] == "-l" then
-        local f = assert(io.open(arg[i + 1], "rb"))
-        local count = 0
-        for line in f:lines() do
-            count = count + 1
-        end
-        f:close()
-        print(count, arg[i + 1])
-
-    elseif arg[i] == "-w" then
-        local f = assert(io.open(arg[i + 1], "rb"))
-        local count = 0
-        for line in f:lines() do
-            for _ in string.gmatch(line, "%S+") do -- matches 1 or more non space chars
-                count = count + 1
-            end
-        end
-        f:close()
-        print(count, arg[i + 1])
-    elseif arg[i] == "-m" then
-        local f = assert(io.open(arg[i + 1], "rb"))
-        local count = 0
-        local line = f:read("*l") -- reads line without newline
-
-        while line do
-            count = count + string.len(line)  
-            local nextLine = f:read("*l")
-            if nextLine then
-                count = count + 1
-            end
-            line = nextLine
-        end
-
-        print(count, arg[i + 1])
-        f:close()
-    else
-        
+-- Simulates wc -c flag (counts bytes)
+local function countBytes(content)
+    local count = 0
+    for _ in string.gmatch(content, ".") do
+        count = count + 1
     end
+    return count
+end
+
+-- Simulates wc -l flag (counts lines)
+local function countLines(content)
+    local count = 0
+    for _ in string.gmatch(content, "[^\n]*\n?") do
+        count = count + 1
+    end
+    return count
+end
+
+-- Simulates wc -w flag (counts words)
+local function countWords(content)
+    local count = 0
+    for _ in string.gmatch(content, "%S+") do
+        count = count + 1
+    end
+    return count
+end
+
+-- Simulates wc -m flag (counts characters)
+local function countChars(content)
+    return string.len(content)
+end
+
+
+-- Main loop
+local i = 0
+local option
+local filename
+for j = 1, #arg do
+    i = i + 1
+end
+if i >= 2 then
+    option = arg[1]
+    filename = arg[2]
+else 
+    filename = arg[1]
+end
+
+
+if option == "-c" or option == "-l" or option == "-w" or option == "-m" then
+    local f = assert(io.open(filename, "rb"))
+    local content = f:read("*a")
+    f:close()
+    local count = 0
+    if option == "-c" then
+        count = countBytes(content)
+    elseif option == "-l" then
+        count = countLines(content)
+    elseif option == "-w" then
+        count = countWords(content)
+    elseif option == "-m" then
+        count = countChars(content)
+    end
+    print(count, filename)
+else
+    local f = assert(io.open(filename, "rb"))
+    local content = f:read("*a")
+    f:close()
+    local count = 0
+    local lines = countLines(content)
+    local words = countWords(content)
+    local bytes = countBytes(content)
+    print(lines, words, bytes, filename)
 end
