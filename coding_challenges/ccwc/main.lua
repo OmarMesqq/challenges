@@ -73,7 +73,7 @@ end
 if i >= 2 then
     option = arg[1]
     filename = arg[2]
-else 
+else
     filename = arg[1]
 end
 
@@ -94,12 +94,10 @@ if option == "-c" or option == "-l" or option == "-w" or option == "-m" then
     end
     print(count, filename)
 else
-    local f = assert(io.open(filename, "rb"))
-    local content = f:read("*a")
-    f:close()
+    local content =io.read("*a")
     local count = 0
     local lines = countLines(content)
     local words = countWords(content)
     local bytes = countBytes(content)
-    print(lines, words, bytes, filename)
+    print(lines, words, bytes)
 end

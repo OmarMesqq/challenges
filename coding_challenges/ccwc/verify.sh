@@ -31,3 +31,11 @@ echo "-------------------------"
 echo "Lua script output"
 lua main.lua -m test.txt
 echo "-------------------------"
+
+echo "Piping filename:" 
+echo "wc output"
+cat test.txt | wc
+echo "-------------------------"
+echo "Lua script output"
+cat test.txt | lua main.lua 
+echo "-------------------------"
