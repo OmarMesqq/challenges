@@ -1,4 +1,4 @@
-// Performs tokenization (lexical analysis)
+// Performs lexical analysis (tokenization)
 const std = @import("std");
 
 pub const TokenType = enum { CurlyOpen, CurlyClose, SquareOpen, SquareClose, Comma, Colon, String, Number, True, False, Null };

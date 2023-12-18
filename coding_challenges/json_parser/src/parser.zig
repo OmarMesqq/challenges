@@ -1,4 +1,4 @@
-// Performs syntactic analysis on a stream of tokens
+// Performs syntactic analysis (parsing) on a stream of tokens
 const std = @import("std");
 const Lexer = @import("lexer.zig").Lexer;
 const Token = @import("lexer.zig").Token;
