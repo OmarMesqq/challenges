@@ -68,5 +68,13 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp"
-    }
+    },
+    "Lua.diagnostics.globals": [
+        "global"
+    ], 
+    "conventionalCommits.scopes": [
+        "codingChallenges", 
+        "leetcode", 
+        "projectEuler"
+    ]
 }
