@@ -13,16 +13,20 @@ class Stack:
     def is_empty(self):
         return len(self.stack) == 0
 
+def getBaselineSize(tree_height):
+    return 1 + (tree_height - 1) * 2
 
 stack = Stack()
-for i in range(6):
-    line = "***********"
+tree_height = 12
+baseline = getBaselineSize(tree_height)
+for i in range(tree_height):
+    line = "*" * baseline
     
     if i == 0: stack.push(line)
     else: 
-        stars = 11 - (2*i)
+        stars = baseline - (2*i)
         newLine = i * " " + "*" * stars + i * " " 
         stack.push(newLine)
 
 
-for i in range(6): print(stack.pop())
+for i in range(tree_height): print(stack.pop())
