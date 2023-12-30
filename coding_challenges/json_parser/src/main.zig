@@ -2,15 +2,20 @@ const std = @import("std");
 const Lexer = @import("lexer.zig").Lexer;
 const Parser = @import("parser.zig").Parser;
 
-const AppErrors = error{InsufficientArgumentsError};
+const AppErrors = error{ InsufficientArgumentsError, TooManyArgumentsError };
 
 pub fn main() !void {
     const args = try std.process.argsAlloc(std.heap.page_allocator);
     defer std.heap.page_allocator.free(args);
 
-    if (args.len < 2) {
+    if (args.len != 2) {
         std.debug.print("Usage: {s} <filename>\n", .{args[0]});
-        return error.InsufficientArguments;
+        if (args.len < 2) {
+            return error.InsufficientArguments;
+        }
+        if (args.len > 2) {
+            return error.TooManyArgumentsError;
+        }
     }
 
     const filename = args[1];
