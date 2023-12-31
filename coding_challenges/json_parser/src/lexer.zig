@@ -3,7 +3,7 @@ const std = @import("std");
 const ArrayList = std.ArrayList;
 
 pub const TokenType = enum { CurlyOpen, CurlyClose };
-const LexicalErrors = error{ UnknownToken, UndefinedToken };
+const LexicalError = error{ UnknownToken, UndefinedToken };
 
 pub const Token = struct { ttype: TokenType };
 
@@ -26,19 +26,21 @@ pub const Lexer = struct {
             switch (value) {
                 '{' => return TokenType.CurlyOpen,
                 '}' => return TokenType.CurlyClose,
-                else => return error.UnknownToken,
+                else => return LexicalError.UnknownToken,
             }
         } else {
-            return error.UndefinedToken;
+            return LexicalError.UndefinedToken;
         }
     }
 
     pub fn tokenize(self: *Lexer) !ArrayList(Token) {
+        if (self.input.len == 0) {
+            return LexicalError.UndefinedToken;
+        }
         for (self.input) |token| {
             const tokenType = try self.nextToken(token);
             try self.tokens.append(Token{ .ttype = tokenType });
-            return self.tokens;
         }
-        return error.UndefinedToken;
+        return self.tokens;
     }
 };
