@@ -5,6 +5,8 @@ const Parser = @import("parser.zig").Parser;
 const AppErrors = error{ InsufficientArgumentsError, TooManyArgumentsError };
 
 pub fn main() !void {
+    var allocator = std.heap.page_allocator;
+
     const args = try std.process.argsAlloc(std.heap.page_allocator);
     defer std.heap.page_allocator.free(args);
 
@@ -19,7 +21,7 @@ pub fn main() !void {
     }
 
     const filename = args[1];
-    std.debug.print("Filename: {s}\n", .{filename});
+    // std.debug.print("Filename: {s}\n", .{filename});
 
     const file = try std.fs.cwd().openFile(filename, .{
         .mode = .read_only, // create an anonymous struct on the fly
@@ -36,5 +38,16 @@ pub fn main() !void {
     _ = try reader.read(buffer);
 
     const fileContents = std.mem.sliceTo(buffer, 0); // search the buffer until null terminator
-    std.debug.print("File Contents: {s}\n", .{fileContents});
+
+    var lexer = Lexer.init(fileContents, &allocator);
+    const tokenList = try lexer.tokenize();
+
+    var parser = Parser.init(&allocator);
+    const isValid = try parser.parse(tokenList);
+
+    if (isValid) {
+        std.debug.print("Valid JSON.\n", .{});
+    } else {
+        std.debug.print("Invalid JSON!\n", .{});
+    }
 }
