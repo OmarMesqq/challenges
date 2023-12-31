@@ -9,7 +9,6 @@ pub const Token = struct { ttype: TokenType };
 
 pub const Lexer = struct {
     input: []const u8,
-    // position: usize,
     tokens: ArrayList(Token),
     allocator: *std.mem.Allocator,
 
@@ -38,8 +37,8 @@ pub const Lexer = struct {
         for (self.input) |token| {
             const tokenType = try self.nextToken(token);
             try self.tokens.append(Token{ .ttype = tokenType });
-            // self.position += 1;
+            return self.tokens;
         }
-        return self.tokens;
+        return error.UndefinedToken;
     }
 };
