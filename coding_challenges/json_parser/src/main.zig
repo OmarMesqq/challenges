@@ -2,8 +2,6 @@ const std = @import("std");
 const Lexer = @import("lexer.zig").Lexer;
 const Parser = @import("parser.zig").Parser;
 
-const AppErrors = error{ InsufficientArgumentsError, TooManyArgumentsError };
-
 pub fn main() !void {
     var allocator = std.heap.page_allocator;
 
@@ -11,17 +9,18 @@ pub fn main() !void {
     defer std.heap.page_allocator.free(args);
 
     if (args.len != 2) {
-        std.debug.print("Usage: {s} <filename>\n", .{args[0]});
+        std.debug.print("Usage: json_parser <filename>\n", .{});
         if (args.len < 2) {
-            return error.InsufficientArguments;
+            std.debug.print("Not enough arguments. Missing filename.\n", .{});
+            return;
         }
         if (args.len > 2) {
-            return error.TooManyArgumentsError;
+            std.debug.print("Too many arguments. Specify only one JSON file.\n", .{});
+            return;
         }
     }
 
     const filename = args[1];
-    // std.debug.print("Filename: {s}\n", .{filename});
 
     const file = try std.fs.cwd().openFile(filename, .{
         .mode = .read_only, // create an anonymous struct on the fly
@@ -40,14 +39,16 @@ pub fn main() !void {
     const fileContents = std.mem.sliceTo(buffer, 0); // search the buffer until null terminator
 
     var lexer = Lexer.init(fileContents, &allocator);
-    const tokenList = try lexer.tokenize();
+    const tokenList = lexer.tokenize() catch |err| {
+        std.debug.print("Error during tokenization!\n{any}\n", .{err});
+        return;
+    };
 
     var parser = Parser.init(&allocator);
-    const isValid = try parser.parse(tokenList);
+    _ = parser.parse(tokenList) catch |err| {
+        std.debug.print("Invalid JSON!\n{any}\n", .{err});
+        return;
+    };
 
-    if (isValid) {
-        std.debug.print("Valid JSON.\n", .{});
-    } else {
-        std.debug.print("Invalid JSON!\n", .{});
-    }
+    std.debug.print("Valid JSON.\n", .{});
 }
