@@ -4,6 +4,8 @@ const ArrayList = std.ArrayList;
 const Token = @import("lexer.zig").Token;
 const TokenType = @import("lexer.zig").TokenType;
 
+const SyntaticError = error{NonMatchingTokens};
+
 pub const Parser = struct {
     tokens: ArrayList(Token),
     allocator: *std.mem.Allocator,
@@ -15,7 +17,7 @@ pub const Parser = struct {
         };
     }
 
-    pub fn parse(self: *Parser, tokens: ArrayList(Token)) !bool {
+    pub fn parse(self: *Parser, tokens: ArrayList(Token)) !void {
         var curlyOpenList = ArrayList(Token).init(self.allocator.*);
         var curlyCloseList = ArrayList(Token).init(self.allocator.*);
 
@@ -33,9 +35,9 @@ pub const Parser = struct {
         }
 
         if (curlyOpenList.items.len == curlyCloseList.items.len) {
-            return true;
+            return;
         } else {
-            return false;
+            return SyntaticError.NonMatchingTokens;
         }
     }
 };
